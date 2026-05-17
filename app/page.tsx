@@ -8,6 +8,7 @@ import ColumnSummaryTable from "@/components/ColumnSummaryTable";
 import StatsCards from "@/components/StatsCards";
 import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, Row } from "@/types/dataset";
+import { uploadDataset } from "@/lib/api";
 
 export default function Home() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -43,23 +44,14 @@ export default function Home() {
         setXAxis(firstTextColumn?.name ?? "");
         setYAxis(firstNumberColumn?.name ?? "");
 
-        const response = await fetch("/api/datasets/upload", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+        const data = await uploadDataset({
           fileName: file.name,
           rowCount: parsedRows.length,
           columnCount: detectedColumns.length,
-        }),
-      });
+        });
 
-      const data = await response.json();
-      console.log("Backend response:", data);
-
-      setDatasetId(data.datasetId);
-      setUploadStatus(data.message);
+        setDatasetId(data.datasetId);
+        setUploadStatus(data.message);
     },
     });
   }
