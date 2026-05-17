@@ -1,65 +1,202 @@
-import Image from "next/image";
+"use client";
+
+import Papa from "papaparse";
+import { useState } from "react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
+type Row = Record<string, string>;
+
+type ColumnSummary = {
+  name: string;
+  type: "number" | "text";
+  missing: number;
+  unique: number;
+  min?: number;
+  max?: number;
+  average?: number;
+};
 
 export default function Home() {
+  const [rows, setRows] = useState<Row[]>([]);
+  const [columns, setColumns] = useState<ColumnSummary[]>([]);
+  const [fileName, setFileName] = useState("");
+
+  function detectColumns(data: Row[]): ColumnSummary[] {
+    if (data.length === 0) return [];
+
+    const columnNames = Object.keys(data[0]);
+
+    return columnNames.map((name) => {
+      const values = data.map((row) => row[name]);
+      const nonEmpty = values.filter((v) => v !== "" && v !== undefined && v !== null);
+      const numericValues = nonEmpty
+        .map((v) => Number(v))
+        .filter((v) => !Number.isNaN(v));
+
+      const isNumber = numericValues.length > 0 && numericValues.length === nonEmpty.length;
+
+      if (isNumber) {
+        const sum = numericValues.reduce((acc, val) => acc + val, 0);
+
+        return {
+          name,
+          type: "number",
+          missing: values.length - nonEmpty.length,
+          unique: new Set(nonEmpty).size,
+          min: Math.min(...numericValues),
+          max: Math.max(...numericValues),
+          average: sum / numericValues.length,
+        };
+      }
+
+      return {
+        name,
+        type: "text",
+        missing: values.length - nonEmpty.length,
+        unique: new Set(nonEmpty).size,
+      };
+    });
+  }
+
+  function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setFileName(file.name);
+
+    Papa.parse<Row>(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const parsedRows = results.data;
+        setRows(parsedRows);
+        setColumns(detectColumns(parsedRows));
+      },
+    });
+  }
+
+  const firstTextColumn = columns.find((col) => col.type === "text");
+  const firstNumberColumn = columns.find((col) => col.type === "number");
+
+  const chartData =
+    firstTextColumn && firstNumberColumn
+      ? rows.slice(0, 20).map((row) => ({
+          name: row[firstTextColumn.name],
+          value: Number(row[firstNumberColumn.name]),
+        }))
+      : [];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="min-h-screen bg-slate-950 text-white p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <section>
+          <h1 className="text-4xl font-bold">InsightForge</h1>
+          <p className="text-slate-400 mt-2">
+            Upload a CSV and generate instant analytics.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        </section>
+
+        <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            className="block w-full text-sm text-slate-300"
+          />
+
+          {fileName && (
+            <p className="mt-4 text-slate-400">
+              Uploaded: <span className="text-white">{fileName}</span>
+            </p>
+          )}
+        </section>
+
+        {rows.length > 0 && (
+          <>
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <p className="text-slate-400">Rows</p>
+                <p className="text-3xl font-bold">{rows.length}</p>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <p className="text-slate-400">Columns</p>
+                <p className="text-3xl font-bold">{columns.length}</p>
+              </div>
+
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+                <p className="text-slate-400">Numeric Columns</p>
+                <p className="text-3xl font-bold">
+                  {columns.filter((col) => col.type === "number").length}
+                </p>
+              </div>
+            </section>
+
+            <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+              <h2 className="text-2xl font-semibold mb-4">Column Summary</h2>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-slate-400 border-b border-slate-800">
+                    <tr>
+                      <th className="text-left py-2">Column</th>
+                      <th className="text-left py-2">Type</th>
+                      <th className="text-left py-2">Missing</th>
+                      <th className="text-left py-2">Unique</th>
+                      <th className="text-left py-2">Min</th>
+                      <th className="text-left py-2">Max</th>
+                      <th className="text-left py-2">Average</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {columns.map((col) => (
+                      <tr key={col.name} className="border-b border-slate-800">
+                        <td className="py-2">{col.name}</td>
+                        <td className="py-2">{col.type}</td>
+                        <td className="py-2">{col.missing}</td>
+                        <td className="py-2">{col.unique}</td>
+                        <td className="py-2">{col.min?.toFixed(2) ?? "-"}</td>
+                        <td className="py-2">{col.max?.toFixed(2) ?? "-"}</td>
+                        <td className="py-2">
+                          {col.average?.toFixed(2) ?? "-"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {chartData.length > 0 && (
+              <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+                <h2 className="text-2xl font-semibold mb-4">
+                  Starter Chart: {firstNumberColumn?.name} by{" "}
+                  {firstTextColumn?.name}
+                </h2>
+
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={chartData}>
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="value" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </section>
+            )}
+          </>
+        )}
+      </div>
+    </main>
   );
 }
