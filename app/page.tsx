@@ -18,6 +18,9 @@ export default function Home() {
   const [xAxis, setXAxis] = useState("");
   const [yAxis, setYAxis] = useState("");
 
+  const [datasetId, setDatasetId] = useState("");
+  const [uploadStatus, setUploadStatus] = useState("");
+
   function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -54,6 +57,9 @@ export default function Home() {
 
       const data = await response.json();
       console.log("Backend response:", data);
+
+      setDatasetId(data.datasetId);
+      setUploadStatus(data.message);
     },
     });
   }
@@ -82,6 +88,16 @@ export default function Home() {
             </p>
           )}
         </section>
+
+        {datasetId && (
+          <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <p className="text-slate-400">Upload Status</p>
+            <p className="text-lg font-semibold">{uploadStatus}</p>
+            <p className="text-sm text-slate-400 mt-2">
+              Dataset ID: <span className="text-white">{datasetId}</span>
+            </p>
+          </section>
+        )}
 
         {rows.length > 0 && (
           <>
