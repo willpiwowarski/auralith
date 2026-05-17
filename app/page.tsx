@@ -2,6 +2,7 @@
 
 import Papa from "papaparse";
 import { useState } from "react";
+import ChartControls from "@/components/ChartControls";
 import ChartSection from "@/components/ChartSection";
 import ColumnSummaryTable from "@/components/ColumnSummaryTable";
 import StatsCards from "@/components/StatsCards";
@@ -12,6 +13,10 @@ export default function Home() {
   const [rows, setRows] = useState<Row[]>([]);
   const [columns, setColumns] = useState<ColumnSummary[]>([]);
   const [fileName, setFileName] = useState("");
+
+  const [chartType, setChartType] = useState("bar");
+  const [xAxis, setXAxis] = useState("");
+  const [yAxis, setYAxis] = useState("");
 
   function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -24,8 +29,16 @@ export default function Home() {
       skipEmptyLines: true,
       complete: (results) => {
         const parsedRows = results.data;
+        const detectedColumns = detectColumns(parsedRows);
+
         setRows(parsedRows);
-        setColumns(detectColumns(parsedRows));
+        setColumns(detectedColumns);
+
+        const firstTextColumn = detectedColumns.find((col) => col.type === "text");
+        const firstNumberColumn = detectedColumns.find((col) => col.type === "number");
+
+        setXAxis(firstTextColumn?.name ?? "");
+        setYAxis(firstNumberColumn?.name ?? "");
       },
     });
   }
@@ -59,7 +72,24 @@ export default function Home() {
           <>
             <StatsCards rows={rows} columns={columns} />
             <ColumnSummaryTable columns={columns} />
-            <ChartSection rows={rows} columns={columns} />
+
+            <ChartControls
+              columns={columns}
+              chartType={chartType}
+              setChartType={setChartType}
+              xAxis={xAxis}
+              setXAxis={setXAxis}
+              yAxis={yAxis}
+              setYAxis={setYAxis}
+            />
+
+            <ChartSection
+              rows={rows}
+              columns={columns}
+              chartType={chartType}
+              xAxis={xAxis}
+              yAxis={yAxis}
+            />
           </>
         )}
       </div>
