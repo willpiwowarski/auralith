@@ -27,7 +27,7 @@ export default function Home() {
     Papa.parse<Row>(file, {
       header: true,
       skipEmptyLines: true,
-      complete: (results) => {
+      complete: async (results) => {
         const parsedRows = results.data;
         const detectedColumns = detectColumns(parsedRows);
 
@@ -39,7 +39,22 @@ export default function Home() {
 
         setXAxis(firstTextColumn?.name ?? "");
         setYAxis(firstNumberColumn?.name ?? "");
-      },
+
+        const response = await fetch("/api/datasets/upload", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileName: file.name,
+          rowCount: parsedRows.length,
+          columnCount: detectedColumns.length,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Backend response:", data);
+    },
     });
   }
 
