@@ -7,8 +7,9 @@ import ChartSection from "@/components/ChartSection";
 import ColumnSummaryTable from "@/components/ColumnSummaryTable";
 import StatsCards from "@/components/StatsCards";
 import { detectColumns } from "@/lib/detectColumns";
-import { ColumnSummary, Row } from "@/types/dataset";
+import { ColumnSummary, DatasetRecord, Row } from "@/types/dataset";
 import { uploadDataset } from "@/lib/api";
+import DatasetHistory from "@/components/DatasetHistory";
 
 export default function Home() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -21,6 +22,8 @@ export default function Home() {
 
   const [datasetId, setDatasetId] = useState("");
   const [uploadStatus, setUploadStatus] = useState("");
+
+  const [datasets, setDatasets] = useState<DatasetRecord[]>([]);
 
   function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -52,6 +55,16 @@ export default function Home() {
 
         setDatasetId(data.datasetId);
         setUploadStatus(data.message);
+        setDatasets((prev) => [
+          {
+            datasetId: data.datasetId,
+            fileName: file.name,
+            rowCount: parsedRows.length,
+            columnCount: detectedColumns.length,
+            uploadedAt: new Date().toISOString(),
+          },
+          ...prev,
+        ]);
     },
     });
   }
@@ -90,6 +103,8 @@ export default function Home() {
             </p>
           </section>
         )}
+
+        <DatasetHistory datasets={datasets} />
 
         {rows.length > 0 && (
           <>
