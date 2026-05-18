@@ -2,6 +2,7 @@ export type UploadDatasetRequest = {
   fileName: string;
   rowCount: number;
   columnCount: number;
+  csvText: string;
 };
 
 export type UploadDatasetResponse = {

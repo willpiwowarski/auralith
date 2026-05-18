@@ -38,11 +38,13 @@ export default function Home() {
   loadDatasets();
 }, []);
 
-  function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setFileName(file.name);
+
+    const csvText = await file.text();
 
     Papa.parse<Row>(file, {
       header: true,
@@ -64,6 +66,7 @@ export default function Home() {
           fileName: file.name,
           rowCount: parsedRows.length,
           columnCount: detectedColumns.length,
+          csvText,
         });
 
         setDatasetId(data.datasetId);

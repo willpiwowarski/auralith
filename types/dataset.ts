@@ -15,5 +15,6 @@ export type DatasetRecord = {
   fileName: string;
   rowCount: number;
   columnCount: number;
+  filePath?: string;
   uploadedAt: string;
 };

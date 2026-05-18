@@ -8,9 +8,10 @@ datasource db {
 }
 
 model Dataset {
-  id           String   @id @default(cuid())
-  fileName     String
-  rowCount     Int
-  columnCount  Int
-  uploadedAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  fileName    String
+  rowCount    Int
+  columnCount Int
+  filePath    String?
+  uploadedAt  DateTime @default(now())
 }
