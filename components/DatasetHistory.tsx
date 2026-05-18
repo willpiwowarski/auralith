@@ -16,7 +16,7 @@ export default function DatasetHistory({
       <div className="space-y-4">
         {datasets.map((dataset) => (
           <div
-            key={dataset.datasetId}
+            key={`${dataset.datasetId}-${dataset.uploadedAt}`}
             className="border border-slate-800 rounded-lg p-4"
           >
             <p className="text-lg font-semibold">{dataset.fileName}</p>

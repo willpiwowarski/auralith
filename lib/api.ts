@@ -27,3 +27,20 @@ export async function uploadDataset(
 
   return response.json();
 }
+
+import { DatasetRecord } from "@/types/dataset";
+
+export type GetDatasetsResponse = {
+  success: boolean;
+  datasets: DatasetRecord[];
+};
+
+export async function getDatasets(): Promise<GetDatasetsResponse> {
+  const response = await fetch("/api/datasets");
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch datasets");
+  }
+
+  return response.json();
+}

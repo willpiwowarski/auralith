@@ -1,14 +1,14 @@
 "use client";
 
 import Papa from "papaparse";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChartControls from "@/components/ChartControls";
 import ChartSection from "@/components/ChartSection";
 import ColumnSummaryTable from "@/components/ColumnSummaryTable";
 import StatsCards from "@/components/StatsCards";
 import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, DatasetRecord, Row } from "@/types/dataset";
-import { uploadDataset } from "@/lib/api";
+import { getDatasets, uploadDataset } from "@/lib/api";
 import DatasetHistory from "@/components/DatasetHistory";
 
 export default function Home() {
@@ -24,6 +24,19 @@ export default function Home() {
   const [uploadStatus, setUploadStatus] = useState("");
 
   const [datasets, setDatasets] = useState<DatasetRecord[]>([]);
+
+  useEffect(() => {
+  async function loadDatasets() {
+    try {
+      const data = await getDatasets();
+      setDatasets(data.datasets);
+    } catch (error) {
+      console.error("Failed to load datasets:", error);
+    }
+  }
+
+  loadDatasets();
+}, []);
 
   function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
