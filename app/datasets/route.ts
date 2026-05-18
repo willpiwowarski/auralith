@@ -46,7 +46,14 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      datasets,
+      datasets: datasets.map((dataset) => ({
+        datasetId: dataset.id,
+        fileName: dataset.fileName,
+        rowCount: dataset.rowCount,
+        columnCount: dataset.columnCount,
+        filePath: dataset.filePath,
+        uploadedAt: dataset.uploadedAt,
+      })),
     });
   } catch (error) {
     console.error("Failed to fetch datasets:", error);
