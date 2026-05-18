@@ -27,9 +27,19 @@ export default function ChartSection({
   xAxis,
   yAxis,
 }: ChartSectionProps) {
-  const chartData = rows.slice(0, 20).map((row) => ({
-    name: row[xAxis],
-    value: Number(row[yAxis]),
+  const groupedData = rows.reduce<Record<string, number>>((acc, row) => {
+    const key = row[xAxis];
+    const value = Number(row[yAxis]);
+
+    if (!key || Number.isNaN(value)) return acc;
+
+    acc[key] = (acc[key] || 0) + value;
+    return acc;
+  }, {});
+
+  const chartData = Object.entries(groupedData).map(([name, value]) => ({
+    name,
+    value,
   }));
 
   if (!xAxis || !yAxis || chartData.length === 0) return null;
@@ -47,18 +57,18 @@ export default function ChartSection({
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Bar dataKey="value" />
+              <Bar dataKey="value" fill="#60a5fa" />
             </BarChart>
           ) : chartType === "line" ? (
             <LineChart data={chartData}>
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip />
-              <Line dataKey="value" />
+              <Line dataKey="value" stroke="#60a5fa" />
             </LineChart>
           ) : (
             <PieChart>
-              <Pie data={chartData} dataKey="value" nameKey="name">
+              <Pie data={chartData} dataKey="value" nameKey="name" fill="#60a5fa">
                 {chartData.map((_, index) => (
                   <Cell key={`cell-${index}`} />
                 ))}

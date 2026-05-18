@@ -45,3 +45,27 @@ export async function getDatasets(): Promise<GetDatasetsResponse> {
 
   return response.json();
 }
+
+export type GetDatasetResponse = {
+  success: boolean;
+  dataset: {
+    datasetId: string;
+    fileName: string;
+    rowCount: number;
+    columnCount: number;
+    uploadedAt: string;
+    csvText: string;
+  };
+};
+
+export async function getDataset(
+  datasetId: string
+): Promise<GetDatasetResponse> {
+  const response = await fetch(`/api/datasets/${datasetId}`);
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch dataset");
+  }
+
+  return response.json();
+}
