@@ -10,6 +10,7 @@ import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, DatasetRecord, Row } from "@/types/dataset";
 import { getDatasets, uploadDataset } from "@/lib/api";
 import DatasetHistory from "@/components/DatasetHistory";
+import AuthHeader from "@/components/AuthHeader";
 
 export default function Home() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -88,6 +89,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-6xl mx-auto space-y-8">
+        <AuthHeader />
+        
         <section>
           <h1 className="text-4xl font-bold">InsightForge</h1>
           <p className="text-slate-400 mt-2">

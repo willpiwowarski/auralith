@@ -9,6 +9,8 @@ import StatsCards from "@/components/StatsCards";
 import ColumnSummaryTable from "@/components/ColumnSummaryTable";
 import ChartControls from "@/components/ChartControls";
 import ChartSection from "@/components/ChartSection";
+import Link from "next/link";
+import AuthHeader from "@/components/AuthHeader";
 
 type DatasetDetailPageProps = {
   params: Promise<{
@@ -79,7 +81,13 @@ export default function DatasetDetailPage({
   return (
     <main className="min-h-screen bg-slate-950 text-white p-8">
       <div className="max-w-6xl mx-auto space-y-8">
+        <AuthHeader />
+
         <section>
+          <Link href="/" className="text-sm text-slate-400 hover:text-white">
+            ← Back to Dashboard
+          </Link>
+
           <h1 className="text-4xl font-bold">{fileName}</h1>
 
           <div className="text-slate-400 mt-2 space-y-1">
