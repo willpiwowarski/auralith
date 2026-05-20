@@ -9,9 +9,9 @@ export default function AuthHeader() {
   return (
     <header className="flex items-center justify-between mb-10 border border-cyan-500/20 bg-slate-950/70 backdrop-blur rounded-2xl px-5 py-4 shadow-[0_0_30px_rgba(34,211,238,0.08)]">
       <Link href="/" className="flex flex-col">
-        <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">InsightForge</span>
+        <span className="text-2xl font-bold tracking-tight bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">Auralith</span>
         <span className="text-xs text-cyan-400/70">
-          Cloud-native AI analytics
+          Visualize data at lightspeed
         </span>
       </Link>
 

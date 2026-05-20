@@ -29,7 +29,7 @@ export default function NaturalLanguageChartBox({
       </h2>
 
       <p className="text-cyan-300/70 mb-5">
-        Ask InsightForge to update your chart.
+        Ask Auralith to update your chart.
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-3">

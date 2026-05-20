@@ -91,7 +91,7 @@ export default function Home() {
     <AppShell>
         
         <section>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-500 bg-clip-text text-transparent">InsightForge</h1>
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-500 bg-clip-text text-transparent">Auralith</h1>
           <p className="text-cyan-300/70 mt-2">
              Upload datasets, generate analytics, and explore cloud-powered insights.
           </p>

@@ -129,7 +129,7 @@ export default function DatasetDetailPage({
     if (fallback.yAxis) setYAxis(fallback.yAxis);
 
     setCommandMessage(
-      "Gemini failed, so InsightForge used the local rule parser instead."
+      "Gemini failed, so Auralith used the local rule parser instead."
     );
   }
 }
