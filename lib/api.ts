@@ -69,3 +69,42 @@ export async function getDataset(
 
   return response.json();
 }
+
+import { ColumnSummary } from "@/types/dataset";
+
+export type GenerateChartRequest = {
+  command: string;
+  columns: ColumnSummary[];
+};
+
+export type GenerateChartResponse = {
+  success: boolean;
+  result: {
+    chartType?: string;
+    xAxis?: string;
+    yAxis?: string;
+  };
+};
+
+export async function generateChartWithAI(
+  payload: GenerateChartRequest
+): Promise<GenerateChartResponse> {
+  const response = await fetch("/api/ai/chart", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    return {
+      success: false,
+      result: {},
+    };
+  }
+
+  return data;
+}

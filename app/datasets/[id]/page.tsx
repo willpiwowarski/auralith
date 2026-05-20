@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
-import { getDataset } from "@/lib/api";
+import { generateChartWithAI, getDataset } from "@/lib/api";
 import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, Row } from "@/types/dataset";
 import ColumnSummaryTable from "@/components/ColumnSummaryTable";
@@ -99,14 +99,39 @@ export default function DatasetDetailPage({
 
   const insights = generateInsights(rows, columns);
 
-  function handleNaturalLanguageCommand(command: string) {
-  const result = parseChartCommand(command, columns);
+  async function handleNaturalLanguageCommand(command: string) {
+  try {
+    setCommandMessage("Thinking with Gemini...");
 
-  if (result.chartType) setChartType(result.chartType);
-  if (result.xAxis) setXAxis(result.xAxis);
-  if (result.yAxis) setYAxis(result.yAxis);
+    const aiResponse = await generateChartWithAI({
+      command,
+      columns,
+    });
 
-  setCommandMessage(result.message);
+    if (!aiResponse.success) {
+      throw new Error("Gemini unavailable");
+    }
+
+    const result = aiResponse.result;
+
+    if (result.chartType) setChartType(result.chartType);
+    if (result.xAxis) setXAxis(result.xAxis);
+    if (result.yAxis) setYAxis(result.yAxis);
+
+    setCommandMessage("Chart updated using Gemini AI.");
+  } catch (error) {
+    console.error("AI chart generation failed:", error);
+
+    const fallback = parseChartCommand(command, columns);
+
+    if (fallback.chartType) setChartType(fallback.chartType);
+    if (fallback.xAxis) setXAxis(fallback.xAxis);
+    if (fallback.yAxis) setYAxis(fallback.yAxis);
+
+    setCommandMessage(
+      "Gemini failed, so InsightForge used the local rule parser instead."
+    );
+  }
 }
 
   return (
