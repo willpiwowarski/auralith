@@ -13,6 +13,7 @@ model Dataset {
   rowCount    Int
   columnCount Int
   filePath    String?
+  s3Key       String?
   uploadedAt  DateTime @default(now())
 
   userId      String?

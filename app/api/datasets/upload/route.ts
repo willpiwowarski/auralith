@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
-import fs from "fs/promises";
-import path from "path";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { s3 } from "@/lib/s3";
 
 export async function POST(request: Request) {
   try {
@@ -41,18 +41,23 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
+    const s3Key = `datasets/${user.id}/${Date.now()}-${body.fileName}`;
 
-    const filePath = path.join(uploadsDir, `${Date.now()}-${body.fileName}`);
-    await fs.writeFile(filePath, body.csvText);
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: process.env.AWS_S3_BUCKET,
+        Key: s3Key,
+        Body: body.csvText,
+        ContentType: "text/csv",
+  })
+);
 
     const dataset = await prisma.dataset.create({
       data: {
         fileName: body.fileName,
         rowCount: body.rowCount,
         columnCount: body.columnCount,
-        filePath,
+        s3Key,
         userId: user.id,
       },
     });
