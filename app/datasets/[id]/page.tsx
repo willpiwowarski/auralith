@@ -16,6 +16,8 @@ import RawDataTable from "@/components/RawDataTable";
 import { generateInsights } from "@/lib/generateInsights";
 import InsightsPanel from "@/components/InsightsPanel";
 import LoadingState from "@/components/LoadingState";
+import NaturalLanguageChartBox from "@/components/NaturalLanguageChartBox";
+import { parseChartCommand } from "@/lib/parseChartCommand";
 
 type DatasetDetailPageProps = {
   params: Promise<{
@@ -36,6 +38,8 @@ export default function DatasetDetailPage({
   const [xAxis, setXAxis] = useState("");
   const [yAxis, setYAxis] = useState("");
   const [activeTab, setActiveTab] = useState("Analytics");
+
+  const [commandMessage, setCommandMessage] = useState("");
 
   useEffect(() => {
     async function loadDataset() {
@@ -95,6 +99,16 @@ export default function DatasetDetailPage({
 
   const insights = generateInsights(rows, columns);
 
+  function handleNaturalLanguageCommand(command: string) {
+  const result = parseChartCommand(command, columns);
+
+  if (result.chartType) setChartType(result.chartType);
+  if (result.xAxis) setXAxis(result.xAxis);
+  if (result.yAxis) setYAxis(result.yAxis);
+
+  setCommandMessage(result.message);
+}
+
   return (
     <AppShell>
 
@@ -128,6 +142,11 @@ export default function DatasetDetailPage({
           <>
 
             <ColumnSummaryTable columns={columns} />
+
+            <NaturalLanguageChartBox
+              onSubmitCommand={handleNaturalLanguageCommand}
+              message={commandMessage}
+            />
 
             <ChartControls
               columns={columns}
