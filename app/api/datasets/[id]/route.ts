@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
-import fs from "fs/promises";
+import { GetObjectCommand } from "@aws-sdk/client-s3";
+import { s3 } from "@/lib/s3";
 
 type DatasetRouteProps = {
   params: Promise<{
@@ -43,14 +44,30 @@ export async function GET(request: Request, { params }: DatasetRouteProps) {
       },
     });
 
-    if (!dataset || !dataset.filePath) {
+    if (!dataset || !dataset.s3Key) {
       return NextResponse.json(
         { success: false, message: "Dataset not found" },
         { status: 404 }
       );
     }
 
-    const csvText = await fs.readFile(dataset.filePath, "utf-8");
+    console.log("Reading dataset from S3:", dataset.s3Key);
+    
+    const s3Response = await s3.send(
+        new GetObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET,
+            Key: dataset.s3Key,
+        })
+    );
+
+    const csvText = await s3Response.Body?.transformToString();
+
+    if (!csvText) {
+        return NextResponse.json(
+            { success: false, message: "Dataset file is empty" },
+            { status: 500 }
+        );
+    }
 
     return NextResponse.json({
       success: true,
