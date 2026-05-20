@@ -1,4 +1,5 @@
 import { ColumnSummary } from "@/types/dataset";
+import MotionCard from "@/components/MotionCard";
 
 type ChartControlsProps = {
   columns: ColumnSummary[];
@@ -23,17 +24,19 @@ export default function ChartControls({
   const numberColumns = columns.filter((col) => col.type === "number");
 
   return (
-    <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-      <h2 className="text-2xl font-semibold mb-6">Chart Builder</h2>
+    <MotionCard
+      delay={0.15}
+      className="bg-slate-950/80 border border-cyan-500/20 rounded-2xl p-6 shadow-[0_0_25px_rgba(34,211,238,0.08)]">
+      <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">Chart Builder</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block mb-2 text-slate-400">Chart Type</label>
+          <label className="block mb-2 text-cyan-300/70">Chart Type</label>
 
           <select
             value={chartType}
             onChange={(e) => setChartType(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3"
+            className="w-full bg-slate-950 border border-cyan-500/20 rounded-xl p-3 text-cyan-50 focus:outline-none focus:border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.06)]"
           >
             <option value="bar">Bar Chart</option>
             <option value="line">Line Chart</option>
@@ -42,12 +45,12 @@ export default function ChartControls({
         </div>
 
         <div>
-          <label className="block mb-2 text-slate-400">X Axis</label>
+          <label className="block mb-2 text-cyan-300/70">X Axis</label>
 
           <select
             value={xAxis}
             onChange={(e) => setXAxis(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3"
+            className="w-full bg-slate-950 border border-cyan-500/20 rounded-xl p-3 text-cyan-50 focus:outline-none focus:border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.06)]"
           >
             {textColumns.map((col) => (
               <option key={col.name} value={col.name}>
@@ -58,12 +61,12 @@ export default function ChartControls({
         </div>
 
         <div>
-          <label className="block mb-2 text-slate-400">Y Axis</label>
+          <label className="block mb-2 text-cyan-300/70">Y Axis</label>
 
           <select
             value={yAxis}
             onChange={(e) => setYAxis(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3"
+            className="w-full bg-slate-950 border border-cyan-500/20 rounded-xl p-3 text-cyan-50 focus:outline-none focus:border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.06)]"
           >
             {numberColumns.map((col) => (
               <option key={col.name} value={col.name}>
@@ -73,6 +76,6 @@ export default function ChartControls({
           </select>
         </div>
       </div>
-    </section>
+    </MotionCard>
   );
 }

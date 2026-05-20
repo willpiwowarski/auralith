@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { GetObjectCommand } from "@aws-sdk/client-s3";
 import { s3 } from "@/lib/s3";
+import fs from "fs/promises";
 
 type DatasetRouteProps = {
   params: Promise<{
@@ -14,7 +15,6 @@ type DatasetRouteProps = {
 export async function GET(request: Request, { params }: DatasetRouteProps) {
   try {
     const { id } = await params;
-
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
@@ -44,29 +44,35 @@ export async function GET(request: Request, { params }: DatasetRouteProps) {
       },
     });
 
-    if (!dataset || !dataset.s3Key) {
+    if (!dataset) {
       return NextResponse.json(
         { success: false, message: "Dataset not found" },
         { status: 404 }
       );
     }
 
-    console.log("Reading dataset from S3:", dataset.s3Key);
-    
-    const s3Response = await s3.send(
+    let csvText = "";
+
+    if (dataset.s3Key) {
+      console.log("Reading dataset from S3:", dataset.s3Key);
+
+      const s3Response = await s3.send(
         new GetObjectCommand({
-            Bucket: process.env.AWS_S3_BUCKET,
-            Key: dataset.s3Key,
+          Bucket: process.env.AWS_S3_BUCKET,
+          Key: dataset.s3Key,
         })
-    );
+      );
 
-    const csvText = await s3Response.Body?.transformToString();
+      csvText = (await s3Response.Body?.transformToString()) ?? "";
+    } else if (dataset.filePath) {
+      console.log("Reading dataset from local file:", dataset.filePath);
 
-    if (!csvText) {
-        return NextResponse.json(
-            { success: false, message: "Dataset file is empty" },
-            { status: 500 }
-        );
+      csvText = await fs.readFile(dataset.filePath, "utf-8");
+    } else {
+      return NextResponse.json(
+        { success: false, message: "Dataset file not found" },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({

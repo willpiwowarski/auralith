@@ -12,6 +12,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import MotionCard from "@/components/MotionCard";
 
 type ChartSectionProps = {
   rows: Row[];
@@ -45,8 +46,10 @@ export default function ChartSection({
   if (!xAxis || !yAxis || chartData.length === 0) return null;
 
   return (
-    <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-      <h2 className="text-2xl font-semibold mb-4">
+    <MotionCard
+    delay={0.15}
+    className="bg-slate-950/80 border border-cyan-500/20 rounded-2xl p-6 shadow-[0_0_25px_rgba(34,211,238,0.08)]">
+      <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
         {chartType.toUpperCase()} Chart: {yAxis} by {xAxis}
       </h2>
 
@@ -78,6 +81,6 @@ export default function ChartSection({
           )}
         </ResponsiveContainer>
       </div>
-    </section>
+    </MotionCard>
   );
 }

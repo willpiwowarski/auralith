@@ -5,12 +5,17 @@ import Papa from "papaparse";
 import { getDataset } from "@/lib/api";
 import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, Row } from "@/types/dataset";
-import StatsCards from "@/components/StatsCards";
 import ColumnSummaryTable from "@/components/ColumnSummaryTable";
 import ChartControls from "@/components/ChartControls";
 import ChartSection from "@/components/ChartSection";
 import Link from "next/link";
-import AuthHeader from "@/components/AuthHeader";
+import AppShell from "@/components/AppShell";
+import KpiCards from "@/components/KpiCards";
+import DatasetTabs from "@/components/DatasetTabs";
+import RawDataTable from "@/components/RawDataTable";
+import { generateInsights } from "@/lib/generateInsights";
+import InsightsPanel from "@/components/InsightsPanel";
+import LoadingState from "@/components/LoadingState";
 
 type DatasetDetailPageProps = {
   params: Promise<{
@@ -30,6 +35,7 @@ export default function DatasetDetailPage({
   const [chartType, setChartType] = useState("bar");
   const [xAxis, setXAxis] = useState("");
   const [yAxis, setYAxis] = useState("");
+  const [activeTab, setActiveTab] = useState("Analytics");
 
   useEffect(() => {
     async function loadDataset() {
@@ -72,16 +78,25 @@ export default function DatasetDetailPage({
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-slate-950 text-white p-8">
-        <p>Loading dataset...</p>
-      </main>
+      <AppShell>
+        <LoadingState />
+      </AppShell>
     );
   }
 
+  const numericColumns = columns.filter(
+  (col) => col.type === "number"
+  ).length;
+
+  const missingValues = columns.reduce(
+    (sum, col) => sum + col.missing,
+    0
+  );
+
+  const insights = generateInsights(rows, columns);
+
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <AuthHeader />
+    <AppShell>
 
         <section>
           <Link href="/" className="text-sm text-slate-400 hover:text-white">
@@ -100,9 +115,17 @@ export default function DatasetDetailPage({
           </div>
         </section>
 
-        {rows.length > 0 && (
+        <KpiCards
+          rows={rows.length}
+          columns={columns.length}
+          numericColumns={numericColumns}
+          missingValues={missingValues}
+        />
+
+        <DatasetTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+
+        {activeTab === "Analytics" && (
           <>
-            <StatsCards rows={rows} columns={columns} />
 
             <ColumnSummaryTable columns={columns} />
 
@@ -125,7 +148,13 @@ export default function DatasetDetailPage({
             />
           </>
         )}
-      </div>
-    </main>
+
+        {activeTab === "Raw Data" && <RawDataTable rows={rows} />}
+
+        {activeTab === "AI Insights" && (
+          <InsightsPanel insights={insights} />
+        )}
+
+      </AppShell>
   );
 }

@@ -10,7 +10,8 @@ import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, DatasetRecord, Row } from "@/types/dataset";
 import { getDatasets, uploadDataset } from "@/lib/api";
 import DatasetHistory from "@/components/DatasetHistory";
-import AuthHeader from "@/components/AuthHeader";
+import AppShell from "@/components/AppShell";
+import UploadDropzone from "@/components/UploadDropzone";
 
 export default function Home() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -87,31 +88,16 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        <AuthHeader />
+    <AppShell>
         
         <section>
-          <h1 className="text-4xl font-bold">InsightForge</h1>
-          <p className="text-slate-400 mt-2">
-            Upload a CSV and generate instant analytics.
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-500 bg-clip-text text-transparent">InsightForge</h1>
+          <p className="text-cyan-300/70 mt-2">
+             Upload datasets, generate analytics, and explore cloud-powered insights.
           </p>
         </section>
 
-        <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <input
-            type="file"
-            accept=".csv"
-            onChange={handleFileUpload}
-            className="block w-full text-sm text-slate-300"
-          />
-
-          {fileName && (
-            <p className="mt-4 text-slate-400">
-              Uploaded: <span className="text-white">{fileName}</span>
-            </p>
-          )}
-        </section>
+        <UploadDropzone onChange={handleFileUpload} />
 
         {datasetId && (
           <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
@@ -149,7 +135,6 @@ export default function Home() {
             />
           </>
         )}
-      </div>
-    </main>
+    </AppShell>
   );
 }
