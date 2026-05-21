@@ -15,12 +15,14 @@ export default function AuthHeader() {
         </span>
       </Link>
 
-      <nav className="hidden md:flex items-center gap-6 text-sm text-slate-300">
-        <Link href="/" className="hover:text-white">
+      <nav className="flex items-center gap-6 text-sm">
+        <a href="/" className="text-cyan-100 hover:text-cyan-300 transition">
           Dashboard
-        </Link>
-        <span className="text-slate-600">Datasets</span>
-        <span className="text-slate-600">AI Insights</span>
+        </a>
+
+        <a href="/datasets" className="text-cyan-300/70 hover:text-cyan-300 transition">
+        Datasets
+        </a>
       </nav>
 
       <div className="flex items-center gap-3">

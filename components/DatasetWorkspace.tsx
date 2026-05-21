@@ -13,6 +13,7 @@ import NaturalLanguageChartBox from "@/components/NaturalLanguageChartBox";
 import { generateInsights } from "@/lib/generateInsights";
 import { parseChartCommand } from "@/lib/parseChartCommand";
 import { generateChartWithAI } from "@/lib/api";
+import AskAIPanel from "@/components/AskAIPanel";
 
 type DatasetWorkspaceProps = {
   rows: Row[];
@@ -120,7 +121,12 @@ export default function DatasetWorkspace({
 
       {activeTab === "Raw Data" && <RawDataTable rows={rows} />}
 
-      {activeTab === "AI Insights" && <InsightsPanel insights={insights} />}
+      {activeTab === "AI Insights" && (
+        <div className="space-y-8">
+          <AskAIPanel rows={rows} columns={columns} />
+          <InsightsPanel insights={insights} />
+        </div>
+      )}
     </section>
   );
 }
