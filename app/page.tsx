@@ -100,12 +100,23 @@ export default function Home() {
         <UploadDropzone onChange={handleFileUpload} />
 
         {datasetId && (
-          <section className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-            <p className="text-slate-400">Upload Status</p>
-            <p className="text-lg font-semibold">{uploadStatus}</p>
-            <p className="text-sm text-slate-400 mt-2">
-              Dataset ID: <span className="text-white">{datasetId}</span>
+          <section className="bg-slate-950/80 border border-cyan-500/20 rounded-2xl p-6 shadow-[0_0_25px_rgba(34,211,238,0.08)]">
+            <p className="text-cyan-300/70">Upload Status</p>
+
+            <p className="text-lg font-semibold text-cyan-50">
+              {uploadStatus}
             </p>
+
+            <p className="text-sm text-cyan-300/70 mt-2">
+              Dataset ID: <span className="text-cyan-50">{datasetId}</span>
+            </p>
+
+            <a
+              href={`/datasets/${datasetId}`}
+              className="inline-block mt-4 bg-gradient-to-r from-cyan-400 to-violet-500 text-slate-950 font-semibold px-5 py-2 rounded-xl hover:opacity-90 transition shadow-[0_0_25px_rgba(34,211,238,0.2)]"
+            >
+              Open Dataset
+            </a>
           </section>
         )}
 
