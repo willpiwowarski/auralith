@@ -2,77 +2,54 @@
 
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
-import { generateChartWithAI, getDataset } from "@/lib/api";
-import { detectColumns } from "@/lib/detectColumns";
-import { ColumnSummary, Row } from "@/types/dataset";
-import ColumnSummaryTable from "@/components/ColumnSummaryTable";
-import ChartControls from "@/components/ChartControls";
-import ChartSection from "@/components/ChartSection";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import KpiCards from "@/components/KpiCards";
-import DatasetTabs from "@/components/DatasetTabs";
-import RawDataTable from "@/components/RawDataTable";
-import { generateInsights } from "@/lib/generateInsights";
-import InsightsPanel from "@/components/InsightsPanel";
 import LoadingState from "@/components/LoadingState";
-import NaturalLanguageChartBox from "@/components/NaturalLanguageChartBox";
-import { parseChartCommand } from "@/lib/parseChartCommand";
+import DatasetWorkspace from "@/components/DatasetWorkspace";
+import { getDataset } from "@/lib/api";
+import { detectColumns } from "@/lib/detectColumns";
+import { Row, ColumnSummary } from "@/types/dataset";
 
-type DatasetDetailPageProps = {
+type DatasetPageProps = {
   params: Promise<{
     id: string;
   }>;
 };
 
-export default function DatasetDetailPage({
-  params,
-}: DatasetDetailPageProps) {
+export default function DatasetDetailPage({ params }: DatasetPageProps) {
   const [datasetId, setDatasetId] = useState("");
   const [fileName, setFileName] = useState("");
   const [rows, setRows] = useState<Row[]>([]);
   const [columns, setColumns] = useState<ColumnSummary[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [chartType, setChartType] = useState("bar");
-  const [xAxis, setXAxis] = useState("");
-  const [yAxis, setYAxis] = useState("");
-  const [activeTab, setActiveTab] = useState("Analytics");
-
-  const [commandMessage, setCommandMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadDataset() {
       try {
         const resolvedParams = await params;
+
         const response = await getDataset(resolvedParams.id);
 
-        setDatasetId(response.dataset.datasetId);
-        setFileName(response.dataset.fileName);
+        const csvText = response.dataset.csvText;
 
-        const parsed = Papa.parse<Row>(response.dataset.csvText, {
+        Papa.parse<Row>(csvText, {
           header: true,
           skipEmptyLines: true,
+          complete: (results) => {
+            const parsedRows = results.data;
+            const detectedColumns = detectColumns(parsedRows);
+
+            setDatasetId(response.dataset.datasetId);
+            setFileName(response.dataset.fileName);
+            setRows(parsedRows);
+            setColumns(detectedColumns);
+            setLoading(false);
+          },
         });
-
-        const parsedRows = parsed.data;
-        const detectedColumns = detectColumns(parsedRows);
-
-        setRows(parsedRows);
-        setColumns(detectedColumns);
-
-        const firstTextColumn = detectedColumns.find(
-          (col) => col.type === "text"
-        );
-        const firstNumberColumn = detectedColumns.find(
-          (col) => col.type === "number"
-        );
-
-        setXAxis(firstTextColumn?.name ?? "");
-        setYAxis(firstNumberColumn?.name ?? "");
       } catch (error) {
         console.error("Failed to load dataset:", error);
-      } finally {
+        setError("Failed to load dataset");
         setLoading(false);
       }
     }
@@ -88,117 +65,41 @@ export default function DatasetDetailPage({
     );
   }
 
-  const numericColumns = columns.filter(
-  (col) => col.type === "number"
-  ).length;
-
-  const missingValues = columns.reduce(
-    (sum, col) => sum + col.missing,
-    0
-  );
-
-  const insights = generateInsights(rows, columns);
-
-  async function handleNaturalLanguageCommand(command: string) {
-  try {
-    setCommandMessage("Thinking with Gemini...");
-
-    const aiResponse = await generateChartWithAI({
-      command,
-      columns,
-    });
-
-    if (!aiResponse.success) {
-      throw new Error("Gemini unavailable");
-    }
-
-    const result = aiResponse.result;
-
-    if (result.chartType) setChartType(result.chartType);
-    if (result.xAxis) setXAxis(result.xAxis);
-    if (result.yAxis) setYAxis(result.yAxis);
-
-    setCommandMessage("Chart updated using Gemini AI.");
-  } catch (error) {
-    console.error("AI chart generation failed:", error);
-
-    const fallback = parseChartCommand(command, columns);
-
-    if (fallback.chartType) setChartType(fallback.chartType);
-    if (fallback.xAxis) setXAxis(fallback.xAxis);
-    if (fallback.yAxis) setYAxis(fallback.yAxis);
-
-    setCommandMessage(
-      "Gemini failed, so Auralith used the local rule parser instead."
+  if (error) {
+    return (
+      <AppShell>
+        <section className="bg-slate-950/80 border border-red-500/30 rounded-2xl p-6">
+          <h1 className="text-2xl font-bold text-red-300">{error}</h1>
+          <Link href="/" className="text-cyan-300 inline-block mt-4">
+            Back to Dashboard
+          </Link>
+        </section>
+      </AppShell>
     );
   }
-}
 
   return (
     <AppShell>
+      <section>
+        <Link href="/" className="text-sm text-cyan-300/70 hover:text-cyan-200">
+          ← Back to Dashboard
+        </Link>
 
-        <section>
-          <Link href="/" className="text-sm text-slate-400 hover:text-white">
-            ← Back to Dashboard
-          </Link>
+        <h1 className="text-5xl font-bold mt-4 bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-500 bg-clip-text text-transparent">
+          {fileName}
+        </h1>
 
-          <h1 className="text-4xl font-bold">{fileName}</h1>
+        <div className="text-cyan-300/70 mt-3 space-y-1">
+          <p>
+            Dataset ID: <span className="text-cyan-50">{datasetId}</span>
+          </p>
+          <p>
+            Rows Loaded: <span className="text-cyan-50">{rows.length}</span>
+          </p>
+        </div>
+      </section>
 
-          <div className="text-slate-400 mt-2 space-y-1">
-            <p>
-              Dataset ID: <span className="text-white">{datasetId}</span>
-            </p>
-            <p>
-              Rows Loaded: <span className="text-white">{rows.length}</span>
-            </p>
-          </div>
-        </section>
-
-        <KpiCards
-          rows={rows.length}
-          columns={columns.length}
-          numericColumns={numericColumns}
-          missingValues={missingValues}
-        />
-
-        <DatasetTabs activeTab={activeTab} setActiveTab={setActiveTab} />
-
-        {activeTab === "Analytics" && (
-          <>
-
-            <ColumnSummaryTable columns={columns} />
-
-            <NaturalLanguageChartBox
-              onSubmitCommand={handleNaturalLanguageCommand}
-              message={commandMessage}
-            />
-
-            <ChartControls
-              columns={columns}
-              chartType={chartType}
-              setChartType={setChartType}
-              xAxis={xAxis}
-              setXAxis={setXAxis}
-              yAxis={yAxis}
-              setYAxis={setYAxis}
-            />
-
-            <ChartSection
-              rows={rows}
-              columns={columns}
-              chartType={chartType}
-              xAxis={xAxis}
-              yAxis={yAxis}
-            />
-          </>
-        )}
-
-        {activeTab === "Raw Data" && <RawDataTable rows={rows} />}
-
-        {activeTab === "AI Insights" && (
-          <InsightsPanel insights={insights} />
-        )}
-
-      </AppShell>
+      <DatasetWorkspace rows={rows} columns={columns} />
+    </AppShell>
   );
 }

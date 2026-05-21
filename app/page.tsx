@@ -2,16 +2,13 @@
 
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
-import ChartControls from "@/components/ChartControls";
-import ChartSection from "@/components/ChartSection";
-import ColumnSummaryTable from "@/components/ColumnSummaryTable";
-import StatsCards from "@/components/StatsCards";
 import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, DatasetRecord, Row } from "@/types/dataset";
 import { getDatasets, uploadDataset } from "@/lib/api";
 import DatasetHistory from "@/components/DatasetHistory";
 import AppShell from "@/components/AppShell";
 import UploadDropzone from "@/components/UploadDropzone";
+import DatasetWorkspace from "@/components/DatasetWorkspace";
 
 export default function Home() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -122,29 +119,8 @@ export default function Home() {
 
         <DatasetHistory datasets={datasets} />
 
-        {rows.length > 0 && (
-          <>
-            <StatsCards rows={rows} columns={columns} />
-            <ColumnSummaryTable columns={columns} />
-
-            <ChartControls
-              columns={columns}
-              chartType={chartType}
-              setChartType={setChartType}
-              xAxis={xAxis}
-              setXAxis={setXAxis}
-              yAxis={yAxis}
-              setYAxis={setYAxis}
-            />
-
-            <ChartSection
-              rows={rows}
-              columns={columns}
-              chartType={chartType}
-              xAxis={xAxis}
-              yAxis={yAxis}
-            />
-          </>
+       {rows.length > 0 && (
+          <DatasetWorkspace rows={rows} columns={columns} />
         )}
     </AppShell>
   );
