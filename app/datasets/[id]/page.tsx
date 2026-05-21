@@ -33,20 +33,32 @@ export default function DatasetDetailPage({ params }: DatasetPageProps) {
 
         const csvText = response.dataset.csvText;
 
-        Papa.parse<Row>(csvText, {
+        const fileName = response.dataset.fileName;
+        const extension = fileName.split(".").pop()?.toLowerCase();
+
+        let parsedRows: Row[] = [];
+
+        if (extension === "csv") {
+          const parseResult = Papa.parse<Row>(csvText, {
           header: true,
           skipEmptyLines: true,
-          complete: (results) => {
-            const parsedRows = results.data;
-            const detectedColumns = detectColumns(parsedRows);
-
-            setDatasetId(response.dataset.datasetId);
-            setFileName(response.dataset.fileName);
-            setRows(parsedRows);
-            setColumns(detectedColumns);
-            setLoading(false);
-          },
         });
+
+        parsedRows = parseResult.data;
+      } else if (extension === "json") {
+        const jsonData = JSON.parse(csvText);
+        parsedRows = Array.isArray(jsonData) ? jsonData : [jsonData];
+      } else {
+        throw new Error("Unsupported file type");
+      }
+
+      const detectedColumns = detectColumns(parsedRows);
+
+      setDatasetId(response.dataset.datasetId);
+      setFileName(fileName);
+      setRows(parsedRows);
+      setColumns(detectedColumns);
+      setLoading(false);
       } catch (error) {
         console.error("Failed to load dataset:", error);
         setError("Failed to load dataset");

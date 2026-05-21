@@ -37,52 +37,70 @@ export default function Home() {
   loadDatasets();
 }, []);
 
-  async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
+  const file = event.target.files?.[0];
 
+  if (!file) return;
+
+  try {
     setFileName(file.name);
 
-    const csvText = await file.text();
+    const fileText = await file.text();
+    const extension = file.name.split(".").pop()?.toLowerCase();
 
-    Papa.parse<Row>(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: async (results) => {
-        const parsedRows = results.data;
-        const detectedColumns = detectColumns(parsedRows);
+    let parsedRows: Row[] = [];
 
-        setRows(parsedRows);
-        setColumns(detectedColumns);
+    if (extension === "csv") {
+      const parseResult = Papa.parse<Row>(fileText, {
+        header: true,
+        skipEmptyLines: true,
+      });
 
-        const firstTextColumn = detectedColumns.find((col) => col.type === "text");
-        const firstNumberColumn = detectedColumns.find((col) => col.type === "number");
+      parsedRows = parseResult.data;
+    } else if (extension === "json") {
+      const jsonData = JSON.parse(fileText);
 
-        setXAxis(firstTextColumn?.name ?? "");
-        setYAxis(firstNumberColumn?.name ?? "");
+      parsedRows = Array.isArray(jsonData) ? jsonData : [jsonData];
+    } else {
+      throw new Error("Unsupported file type");
+    }
 
-        const data = await uploadDataset({
-          fileName: file.name,
-          rowCount: parsedRows.length,
-          columnCount: detectedColumns.length,
-          csvText,
-        });
+    const detectedColumns = detectColumns(parsedRows);
 
-        setDatasetId(data.datasetId);
-        setUploadStatus(data.message);
-        setDatasets((prev) => [
-          {
-            datasetId: data.datasetId,
-            fileName: file.name,
-            rowCount: parsedRows.length,
-            columnCount: detectedColumns.length,
-            uploadedAt: new Date().toISOString(),
-          },
-          ...prev,
-        ]);
-    },
+    setRows(parsedRows);
+    setColumns(detectedColumns);
+
+    const firstTextColumn = detectedColumns.find((col) => col.type === "text");
+    const firstNumberColumn = detectedColumns.find((col) => col.type === "number");
+
+    setXAxis(firstTextColumn?.name ?? "");
+    setYAxis(firstNumberColumn?.name ?? "");
+
+    const data = await uploadDataset({
+      fileName: file.name,
+      rowCount: parsedRows.length,
+      columnCount: detectedColumns.length,
+      csvText: fileText,
     });
+
+    setDatasetId(data.datasetId);
+    setUploadStatus(data.message);
+
+    setDatasets((prev) => [
+      {
+        datasetId: data.datasetId,
+        fileName: file.name,
+        rowCount: parsedRows.length,
+        columnCount: detectedColumns.length,
+        uploadedAt: new Date().toISOString(),
+      },
+      ...prev,
+    ]);
+  } catch (error) {
+    console.error("Upload failed:", error);
+    setUploadStatus("Upload failed");
   }
+}
 
   return (
     <AppShell>

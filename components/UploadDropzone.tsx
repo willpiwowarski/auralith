@@ -31,13 +31,13 @@ export default function UploadDropzone({ onChange }: Props) {
         <label className="mt-8">
           <input
             type="file"
-            accept=".csv"
+            accept=".csv,.json"
             onChange={onChange}
             className="hidden"
           />
 
           <span className="cursor-pointer inline-flex items-center gap-2 bg-gradient-to-r from-cyan-400 to-violet-500 text-slate-950 font-semibold px-6 py-3 rounded-2xl hover:opacity-90 transition shadow-[0_0_30px_rgba(34,211,238,0.25)]">
-            Select CSV File
+            Select Dataset File
           </span>
         </label>
       </div>

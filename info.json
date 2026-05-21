@@ -1,0 +1,38 @@
+[
+  {
+    "region": "East",
+    "sales": 1200,
+    "profit": 300,
+    "month": "January"
+  },
+  {
+    "region": "West",
+    "sales": 950,
+    "profit": 200,
+    "month": "January"
+  },
+  {
+    "region": "North",
+    "sales": 1600,
+    "profit": 500,
+    "month": "February"
+  },
+  {
+    "region": "South",
+    "sales": 700,
+    "profit": 100,
+    "month": "February"
+  },
+  {
+    "region": "East",
+    "sales": 1800,
+    "profit": 600,
+    "month": "March"
+  },
+  {
+    "region": "West",
+    "sales": 1100,
+    "profit": 250,
+    "month": "March"
+  }
+]
