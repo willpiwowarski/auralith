@@ -1,6 +1,7 @@
 "use client";
 
 import Papa from "papaparse";
+import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
 import { detectColumns } from "@/lib/detectColumns";
 import { ColumnSummary, DatasetRecord, Row } from "@/types/dataset";
@@ -45,25 +46,50 @@ async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
   try {
     setFileName(file.name);
 
-    const fileText = await file.text();
     const extension = file.name.split(".").pop()?.toLowerCase();
 
-    let parsedRows: Row[] = [];
+let parsedRows: Row[] = [];
+let fileText = "";
 
-    if (extension === "csv") {
-      const parseResult = Papa.parse<Row>(fileText, {
-        header: true,
-        skipEmptyLines: true,
-      });
+if (extension === "csv") {
+  fileText = await file.text();
 
-      parsedRows = parseResult.data;
-    } else if (extension === "json") {
-      const jsonData = JSON.parse(fileText);
+  const parseResult = Papa.parse<Row>(fileText, {
+    header: true,
+    skipEmptyLines: true,
+  });
 
-      parsedRows = Array.isArray(jsonData) ? jsonData : [jsonData];
-    } else {
-      throw new Error("Unsupported file type");
-    }
+  parsedRows = parseResult.data;
+} else if (extension === "json") {
+  fileText = await file.text();
+
+  const jsonData = JSON.parse(fileText);
+
+  parsedRows = Array.isArray(jsonData) ? jsonData : [jsonData];
+} else if (extension === "xlsx") {
+  const arrayBuffer = await file.arrayBuffer();
+
+  const workbook = XLSX.read(arrayBuffer, {
+    type: "array",
+  });
+
+  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+  parsedRows = XLSX.utils.sheet_to_json<Row>(firstSheet, {
+    defval: "",
+    raw: false,
+  });
+
+  parsedRows = parsedRows.filter((row) =>
+    Object.values(row).some(
+      (value) => value !== null && value !== ""
+    )
+  );
+
+  fileText = JSON.stringify(parsedRows);
+} else {
+  throw new Error("Unsupported file type");
+}
 
     const detectedColumns = detectColumns(parsedRows);
 
@@ -76,11 +102,10 @@ async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     setXAxis(firstTextColumn?.name ?? "");
     setYAxis(firstNumberColumn?.name ?? "");
 
-    const data = await uploadDataset({
+    const data = await uploadDataset(file, fileText, {
       fileName: file.name,
       rowCount: parsedRows.length,
       columnCount: detectedColumns.length,
-      csvText: fileText,
     });
 
     setDatasetId(data.datasetId);

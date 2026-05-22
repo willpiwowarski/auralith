@@ -8,16 +8,19 @@ datasource db {
 }
 
 model Dataset {
-  id          String   @id @default(cuid())
-  fileName    String
-  rowCount    Int
-  columnCount Int
-  filePath    String?
-  s3Key       String?
-  uploadedAt  DateTime @default(now())
+  id                  String   @id @default(cuid())
+  fileName            String
+  rowCount            Int
+  columnCount         Int
+  filePath            String?
+  // s3Key holds the parsed JSON projection used by the workspace view.
+  s3Key               String?
+  originalS3Key       String?
+  originalContentType String?
+  uploadedAt          DateTime @default(now())
 
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
+  userId              String?
+  user                User?    @relation(fields: [userId], references: [id])
 }
 
 model User {

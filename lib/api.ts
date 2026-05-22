@@ -1,8 +1,7 @@
-export type UploadDatasetRequest = {
+export type UploadDatasetMetadata = {
   fileName: string;
   rowCount: number;
   columnCount: number;
-  csvText: string;
 };
 
 export type UploadDatasetResponse = {
@@ -12,14 +11,20 @@ export type UploadDatasetResponse = {
 };
 
 export async function uploadDataset(
-  payload: UploadDatasetRequest
+  file: File,
+  projection: string,
+  metadata: UploadDatasetMetadata
 ): Promise<UploadDatasetResponse> {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("projection", projection);
+  formData.append("fileName", metadata.fileName);
+  formData.append("rowCount", String(metadata.rowCount));
+  formData.append("columnCount", String(metadata.columnCount));
+
   const response = await fetch("/api/datasets/upload", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
+    body: formData,
   });
 
   if (!response.ok) {
