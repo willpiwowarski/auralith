@@ -45,7 +45,7 @@ export default function DatasetDetailPage({ params }: DatasetPageProps) {
         });
 
         parsedRows = parseResult.data;
-      } else if (extension === "json") {
+      } else if (extension === "json" || extension === "xlsx") {
         const jsonData = JSON.parse(csvText);
         parsedRows = Array.isArray(jsonData) ? jsonData : [jsonData];
       } else {
