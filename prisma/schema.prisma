@@ -21,6 +21,17 @@ model Dataset {
 
   userId              String?
   user                User?    @relation(fields: [userId], references: [id])
+
+  chatMessages        ChatMessage[]
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  datasetId  String
+  dataset    Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  role       String
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
 }
 
 model User {

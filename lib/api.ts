@@ -75,7 +75,7 @@ export async function getDataset(
   return response.json();
 }
 
-import { ColumnSummary } from "@/types/dataset";
+import { ColumnSummary, Row } from "@/types/dataset";
 
 export type GenerateChartRequest = {
   command: string;
@@ -124,4 +124,78 @@ export async function generateChartWithAI(
   }
 
   return data;
+}
+
+export type ChatRole = "user" | "assistant";
+
+export type ChatMessage = {
+  id: string;
+  datasetId: string;
+  role: ChatRole;
+  content: string;
+  createdAt: string;
+};
+
+export type AskAIRequest = {
+  datasetId: string;
+  message: string;
+  rows: Row[];
+  columns: ColumnSummary[];
+};
+
+export type AskAIResponse = {
+  success: boolean;
+  message: string;
+};
+
+export async function askAI(payload: AskAIRequest): Promise<AskAIResponse> {
+  const response = await fetch("/api/ai/ask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data?.success) {
+    return {
+      success: false,
+      message:
+        typeof data?.message === "string"
+          ? data.message
+          : "AI request failed. Please try again.",
+    };
+  }
+
+  return {
+    success: true,
+    message: typeof data.message === "string" ? data.message : "",
+  };
+}
+
+export type LoadConversationResponse = {
+  success: boolean;
+  messages: ChatMessage[];
+};
+
+export async function loadConversation(
+  datasetId: string
+): Promise<LoadConversationResponse> {
+  const response = await fetch(
+    `/api/ai/ask/${encodeURIComponent(datasetId)}`
+  );
+
+  if (!response.ok) {
+    return { success: false, messages: [] };
+  }
+
+  const data = await response.json();
+
+  if (!data?.success || !Array.isArray(data.messages)) {
+    return { success: false, messages: [] };
+  }
+
+  return { success: true, messages: data.messages };
 }

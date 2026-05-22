@@ -103,7 +103,7 @@ export default function DatasetDetailPage({ params }: DatasetPageProps) {
         </div>
       </section>
 
-      <DatasetWorkspace rows={rows} columns={columns} />
+      <DatasetWorkspace rows={rows} columns={columns} datasetId={datasetId} />
     </AppShell>
   );
 }

@@ -21,11 +21,13 @@ import AskAIPanel from "@/components/AskAIPanel";
 type DatasetWorkspaceProps = {
   rows: Row[];
   columns: ColumnSummary[];
+  datasetId: string;
 };
 
 export default function DatasetWorkspace({
   rows,
   columns,
+  datasetId,
 }: DatasetWorkspaceProps) {
   const [activeTab, setActiveTab] = useState("Analytics");
 
@@ -132,7 +134,7 @@ export default function DatasetWorkspace({
 
       {activeTab === "AI Insights" && (
         <div className="space-y-8">
-          <AskAIPanel rows={rows} columns={columns} />
+          <AskAIPanel datasetId={datasetId} rows={rows} columns={columns} />
           <InsightsPanel insights={insights} />
         </div>
       )}

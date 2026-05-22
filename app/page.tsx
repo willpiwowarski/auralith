@@ -163,7 +163,7 @@ if (extension === "csv") {
         <DatasetHistory datasets={datasets} />
 
        {rows.length > 0 && (
-          <DatasetWorkspace rows={rows} columns={columns} />
+          <DatasetWorkspace rows={rows} columns={columns} datasetId={datasetId} />
         )}
     </AppShell>
   );
