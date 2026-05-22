@@ -50,7 +50,7 @@ export default function DatasetsPage() {
         <section className="bg-slate-950/80 border border-cyan-500/20 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-cyan-50">No datasets yet</h2>
           <p className="text-cyan-300/70 mt-2">
-            Upload a CSV from the dashboard to begin analyzing data.
+            Upload a dataset from the dashboard to begin analyzing data.
           </p>
 
           <Link

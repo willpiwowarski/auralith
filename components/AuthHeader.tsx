@@ -2,9 +2,17 @@
 
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function AuthHeader() {
   const { data: session } = useSession();
+  const pathname = usePathname();
+
+  const isDashboard = pathname === "/";
+  const isDatasets = pathname === "/datasets";
+
+  const activeClass = "text-cyan-100 hover:text-cyan-300 transition";
+  const inactiveClass = "text-cyan-300/70 hover:text-cyan-300 transition";
 
   return (
     <header className="flex items-center justify-between mb-10 border border-cyan-500/20 bg-slate-950/70 backdrop-blur rounded-2xl px-5 py-4 shadow-[0_0_30px_rgba(34,211,238,0.08)]">
@@ -16,13 +24,13 @@ export default function AuthHeader() {
       </Link>
 
       <nav className="flex items-center gap-6 text-sm">
-        <a href="/" className="text-cyan-100 hover:text-cyan-300 transition">
+        <Link href="/" className={isDashboard ? activeClass : inactiveClass}>
           Dashboard
-        </a>
+        </Link>
 
-        <a href="/datasets" className="text-cyan-300/70 hover:text-cyan-300 transition">
-        Datasets
-        </a>
+        <Link href="/datasets" className={isDatasets ? activeClass : inactiveClass}>
+          Datasets
+        </Link>
       </nav>
 
       <div className="flex items-center gap-3">

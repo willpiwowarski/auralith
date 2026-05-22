@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { DatasetRecord } from "@/types/dataset";
 
 type DatasetHistoryProps = {
@@ -15,9 +16,10 @@ export default function DatasetHistory({
 
       <div className="space-y-4">
         {datasets.map((dataset) => (
-          <div
+          <Link
             key={`${dataset.datasetId}-${dataset.uploadedAt}`}
-            className="border border-cyan-500/20 rounded-xl p-4 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.12)] transition"
+            href={`/datasets/${dataset.datasetId}`}
+            className="block border border-cyan-500/20 rounded-xl p-4 hover:border-cyan-400/50 hover:shadow-[0_0_20px_rgba(34,211,238,0.12)] transition"
           >
             <p className="text-lg font-semibold">{dataset.fileName}</p>
 
@@ -30,7 +32,7 @@ export default function DatasetHistory({
                 {new Date(dataset.uploadedAt).toLocaleString()}
               </p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

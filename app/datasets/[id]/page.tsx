@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
-import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import LoadingState from "@/components/LoadingState";
 import DatasetWorkspace from "@/components/DatasetWorkspace";
@@ -82,9 +81,6 @@ export default function DatasetDetailPage({ params }: DatasetPageProps) {
       <AppShell>
         <section className="bg-slate-950/80 border border-red-500/30 rounded-2xl p-6">
           <h1 className="text-2xl font-bold text-red-300">{error}</h1>
-          <Link href="/" className="text-cyan-300 inline-block mt-4">
-            Back to Dashboard
-          </Link>
         </section>
       </AppShell>
     );
@@ -93,11 +89,7 @@ export default function DatasetDetailPage({ params }: DatasetPageProps) {
   return (
     <AppShell>
       <section>
-        <Link href="/" className="text-sm text-cyan-300/70 hover:text-cyan-200">
-          ← Back to Dashboard
-        </Link>
-
-        <h1 className="text-5xl font-bold mt-4 bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-500 bg-clip-text text-transparent">
+        <h1 className="text-5xl font-bold bg-gradient-to-r from-cyan-300 via-blue-400 to-violet-500 bg-clip-text text-transparent">
           {fileName}
         </h1>
 

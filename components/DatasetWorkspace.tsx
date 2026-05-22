@@ -11,8 +11,11 @@ import RawDataTable from "@/components/RawDataTable";
 import InsightsPanel from "@/components/InsightsPanel";
 import NaturalLanguageChartBox from "@/components/NaturalLanguageChartBox";
 import { generateInsights } from "@/lib/generateInsights";
-import { parseChartCommand } from "@/lib/parseChartCommand";
-import { generateChartWithAI } from "@/lib/api";
+import {
+  generateChartWithAI,
+  ChartAggregation,
+  ChartFilter,
+} from "@/lib/api";
 import AskAIPanel from "@/components/AskAIPanel";
 
 type DatasetWorkspaceProps = {
@@ -32,6 +35,8 @@ export default function DatasetWorkspace({
   const [chartType, setChartType] = useState("bar");
   const [xAxis, setXAxis] = useState(firstTextColumn?.name ?? "");
   const [yAxis, setYAxis] = useState(firstNumberColumn?.name ?? "");
+  const [agg, setAgg] = useState<ChartAggregation>("sum");
+  const [filter, setFilter] = useState<ChartFilter | undefined>(undefined);
   const [commandMessage, setCommandMessage] = useState("");
 
   const numericColumns = columns.filter((col) => col.type === "number").length;
@@ -50,7 +55,11 @@ export default function DatasetWorkspace({
       });
 
       if (!aiResponse.success) {
-        throw new Error("Gemini unavailable");
+        setCommandMessage(
+          aiResponse.message ??
+            "Chart AI is unavailable right now — try the manual controls below."
+        );
+        return;
       }
 
       const result = aiResponse.result;
@@ -58,19 +67,15 @@ export default function DatasetWorkspace({
       if (result.chartType) setChartType(result.chartType);
       if (result.xAxis) setXAxis(result.xAxis);
       if (result.yAxis) setYAxis(result.yAxis);
+      if (result.agg) setAgg(result.agg);
+      setFilter(result.filter);
 
       setCommandMessage("Chart updated using Gemini AI.");
     } catch (error) {
       console.error("AI chart generation failed:", error);
 
-      const fallback = parseChartCommand(command, columns);
-
-      if (fallback.chartType) setChartType(fallback.chartType);
-      if (fallback.xAxis) setXAxis(fallback.xAxis);
-      if (fallback.yAxis) setYAxis(fallback.yAxis);
-
       setCommandMessage(
-        "Gemini failed, so Auralith used the local rule parser instead."
+        "Chart AI is unavailable right now — try the manual controls below."
       );
     }
   }
@@ -107,6 +112,8 @@ export default function DatasetWorkspace({
             setXAxis={setXAxis}
             yAxis={yAxis}
             setYAxis={setYAxis}
+            agg={agg}
+            setAgg={setAgg}
           />
 
           <ChartSection
@@ -115,6 +122,8 @@ export default function DatasetWorkspace({
             chartType={chartType}
             xAxis={xAxis}
             yAxis={yAxis}
+            agg={agg}
+            filter={filter}
           />
         </>
       )}

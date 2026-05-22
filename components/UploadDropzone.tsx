@@ -24,14 +24,14 @@ export default function UploadDropzone({ onChange }: Props) {
         </h2>
 
         <p className="mt-3 text-cyan-300/70 max-w-lg">
-          Upload CSV datasets and generate cloud-powered analytics,
+          Upload CSV, JSON, and XLSX datasets and generate cloud-powered analytics,
           visualizations, and AI-ready insights instantly.
         </p>
 
         <label className="mt-8">
           <input
             type="file"
-            accept=".csv,.json"
+            accept=".csv,.json,.xlsx"
             onChange={onChange}
             className="hidden"
           />

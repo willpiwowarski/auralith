@@ -82,12 +82,23 @@ export type GenerateChartRequest = {
   columns: ColumnSummary[];
 };
 
+export type ChartAggregation = "sum" | "avg" | "count" | "min" | "max";
+
+export type ChartFilter = {
+  column: string;
+  op: "equals";
+  value: string;
+};
+
 export type GenerateChartResponse = {
   success: boolean;
+  message?: string;
   result: {
-    chartType?: string;
+    chartType?: "bar" | "line" | "pie";
     xAxis?: string;
     yAxis?: string;
+    agg?: ChartAggregation;
+    filter?: ChartFilter;
   };
 };
 
@@ -107,6 +118,7 @@ export async function generateChartWithAI(
   if (!response.ok) {
     return {
       success: false,
+      message: typeof data?.message === "string" ? data.message : undefined,
       result: {},
     };
   }
