@@ -122,7 +122,7 @@ export default function AskAIPanel({ datasetId, rows, columns }: Props) {
   const disabled = !datasetId || loading;
 
   return (
-    <section className="bg-slate-950/80 border border-cyan-500/20 rounded-2xl p-6 shadow-[0_0_25px_rgba(34,211,238,0.08)]">
+    <section className="flex flex-col max-h-[75vh] bg-slate-950/80 border border-cyan-500/20 rounded-2xl p-6 shadow-[0_0_25px_rgba(34,211,238,0.08)]">
       <h2 className="text-3xl font-bold bg-gradient-to-r from-cyan-300 to-violet-400 bg-clip-text text-transparent">
         Ask Auralith AI
       </h2>
@@ -134,7 +134,7 @@ export default function AskAIPanel({ datasetId, rows, columns }: Props) {
 
       <div
         ref={scrollRef}
-        className="mt-6 max-h-96 overflow-y-auto space-y-3 pr-1"
+        className="mt-6 flex-1 min-h-[12rem] overflow-y-auto space-y-3 pr-1"
       >
         {!datasetId && (
           <p className="text-cyan-300/70 text-sm">
@@ -169,7 +169,7 @@ export default function AskAIPanel({ datasetId, rows, columns }: Props) {
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 flex gap-3">
+      <form onSubmit={handleSubmit} className="mt-6 flex gap-3 shrink-0">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
