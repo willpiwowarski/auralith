@@ -4,6 +4,12 @@ AI-powered dataset exploration. Upload a CSV, XLSX, or JSON file and Auralith pr
 
 ![Auralith workspace](docs/screenshot.png)
 
+*Natural-language chart generation — type a prompt like "show profit by month as a pie chart" and Auralith maps it to a validated chart config via Gemini.*
+
+![Auralith chat assistant](docs/chat.png)
+
+*Per-dataset conversational AI assistant with persisted message history.*
+
 ## Features
 
 - **Drop-in uploads** for CSV, XLSX, and JSON. The original file is preserved alongside a parsed JSON projection so the workspace can reload instantly.
