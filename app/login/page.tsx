@@ -3,10 +3,14 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 
+const DEMO_EMAIL = "guest@auralith.app";
+const DEMO_PASSWORD = "auralith-guest-2026";
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [demoLoading, setDemoLoading] = useState(false);
 
   async function handleLogin(event: React.FormEvent) {
     event.preventDefault();
@@ -19,6 +23,25 @@ export default function LoginPage() {
 
     if (result?.error) {
       setMessage("Invalid credentials");
+      return;
+    }
+
+    window.location.href = "/";
+  }
+
+  async function handleDemoLogin() {
+    setDemoLoading(true);
+    setMessage("");
+
+    const result = await signIn("credentials", {
+      email: DEMO_EMAIL,
+      password: DEMO_PASSWORD,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      setMessage("Demo account is temporarily unavailable. Try registering instead.");
+      setDemoLoading(false);
       return;
     }
 
@@ -72,6 +95,25 @@ export default function LoginPage() {
         {message && (
           <p className="text-sm text-red-400 text-center">{message}</p>
         )}
+
+        <div className="flex items-center gap-3 text-xs text-cyan-300/40 uppercase tracking-wider">
+          <div className="flex-1 h-px bg-cyan-500/20" />
+          <span>or</span>
+          <div className="flex-1 h-px bg-cyan-500/20" />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleDemoLogin}
+          disabled={demoLoading}
+          className="w-full bg-slate-950 border border-cyan-500/40 text-cyan-200 rounded-xl p-3 font-semibold hover:border-cyan-400 hover:text-cyan-100 transition disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {demoLoading ? "Loading demo…" : "Try the demo (no signup)"}
+        </button>
+
+        <p className="text-xs text-cyan-300/50 text-center -mt-1">
+          Explore Auralith with a pre-loaded dataset.
+        </p>
 
         <p className="text-sm text-cyan-300/70 text-center">
           New to Auralith?{" "}
