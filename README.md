@@ -118,4 +118,4 @@ types/dataset.ts       Shared Row / ColumnSummary / DatasetRecord types
 
 ## License
 
-Private project. All rights reserved.
+MIT — see [LICENSE](LICENSE) for the full text.
