@@ -2,6 +2,15 @@
 
 AI-powered dataset exploration. Upload a CSV, XLSX, or JSON file and Auralith profiles your columns, surfaces KPIs and insights, generates charts from natural-language prompts, and lets you chat with your data.
 
+## Live demo
+
+Try Auralith at **[auralith-delta.vercel.app](https://auralith-delta.vercel.app)**.
+
+No signup required — on the login page, click **"Try the demo (no signup)"** to sign in instantly as a guest. From there you can:
+
+- Click **Datasets** in the top nav to explore the pre-uploaded sample datasets (coffee shop sales and marketing campaigns) and open any of them to see the workspace, KPIs, charts, and chat history.
+- Or upload your own CSV, XLSX, or JSON file from the home page to run Auralith on your own data.
+
 ![Auralith workspace](docs/screenshot.png)
 
 *Natural-language chart generation — type a prompt like "show profit by month as a pie chart" and Auralith maps it to a validated chart config via Gemini.*
